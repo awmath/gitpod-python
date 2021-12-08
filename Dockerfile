@@ -4,14 +4,10 @@ FROM gitpod/workspace-full:latest
 ARG PYTHON_VERSION
 ENV PYTHON_VERSION=${PYTHON_VERSION:-3.9.9}
 
-# 
-ENV PYENV_ROOT=/workspace/.pyenv
-ENV PATH="${PYENV_ROOT}/bin:${PATH}"
-
+# move pyenv to a persitent location
 RUN pyenv update && pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION \
     && python3 -m pip install --no-cache-dir --upgrade pip \
-    && python3 -m pip install --no-cache-dir --upgrade \
-        setuptools wheel virtualenv pipenv pylint rope flake8 \
-        mypy autopep8 pep8 pylama pydocstyle bandit notebook \
-        twine \
     && sudo rm -rf /tmp/*
+
+# fix non persistent pip packages: https://github.com/gitpod-io/gitpod/issues/7077
+ENV PIP_USER=yes
